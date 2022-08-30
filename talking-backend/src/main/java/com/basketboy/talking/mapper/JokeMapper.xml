@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.basketboy.talking.mapper.JokeMapper">
+
+    <resultMap id="BaseResultMap" type="com.basketboy.talking.pojo.JokeBean">
+        <result column="joke_id" property="jokeId" jdbcType="VARCHAR"/>
+        <result column="joke_user_id" property="jokeUserId" jdbcType="VARCHAR"/>
+        <result column="title" property="title" jdbcType="VARCHAR"/>
+        <result column="category" property="category" jdbcType="VARCHAR"/>
+        <result column="tags" property="tags" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="contentHtml" property="contentHtml" jdbcType="VARCHAR"/>
+        <result column="cover_img" property="coverImg" jdbcType="VARCHAR"/>
+        <result column="art_like_count" property="articleLikeCount"
+                jdbcType="INTEGER"/>
+        <result column="art_comment_count" property="articleCommentCount"
+                jdbcType="INTEGER"/>
+        <result column="post_time" property="postTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="JokeLikeMap" type="com.basketboy.talking.pojo.JokeLikeBean">
+        <result column="joke_id" property="joke_id" jdbcType="VARCHAR"/>
+        <result column="joke_user_id" property="joke_user_id" jdbcType="VARCHAR"/>
+        <result column="approval_time" property="approvalTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <resultMap id="JokeCommentMap" type="com.basketboy.talking.pojo.CommentBean">
+        <result column="comment_id" property="commentId" jdbcType="VARCHAR"/>
+        <result column="joke_id" property="jokeId" jdbcType="VARCHAR"/>
+        <result column="comment_user_id" property="commentUserId"
+                jdbcType="VARCHAR"/>
+        <result column="comment_details" property="commentDetails"
+                jdbcType="VARCHAR"/>
+        <result column="comment_date" property="commentDate" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="addJoke" parameterType="com.basketboy.talking.pojo.JokeBean">
+        insert into y_joke
+        (joke_id,
+        joke_user_id,
+        title,
+        category,
+        tags,
+        cover_img,
+        content,
+        contentHtml,
+        post_time,
+        art_like_count,
+        art_comment_count
+        ) values
+        (#{jokeId},
+        #{jokeUserId},
+        #{title},
+        #{category},
+        #{tags},
+        #{coverImg},
+        #{content},
+        #{contentHtml},
+        #{postTime},
+        #{articleLikeCount},
+        #{articleCommentCount}
+        )
+    </insert>
+
+    <!-- asc 按升序排列 (不用写，默认使用这个) desc 按降序排列 -->
+    <select id="getJokeList" resultMap="BaseResultMap">
+        select * from y_joke order by
+        id desc
+    </select>
+
+    <select id="getJokeListTags" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select * from y_joke where tags like concat('%',#{tag},'%') order by
+        id desc
+    </select>
+
+    <select id="selectJokeLikeById" resultMap="JokeLikeMap">
+        select * from
+        y_joke_like
+        where joke_id = #{joke_id}
+    </select>
+
+    <select id="getJokeBeanById" resultMap="BaseResultMap">
+        select * from
+        y_joke
+        where joke_id = #{jokeId}
+    </select>
+
+    <insert id="thumbsJoke" parameterType="com.basketboy.talking.pojo.JokeLikeBean">
+        insert into y_joke_like(
+        approval_time,
+        joke_id,
+        joke_user_id)
+        values(
+        #{approvalTime},
+        #{joke_id},
+        #{joke_user_id})
+    </insert>
+
+    <insert id="addComment" parameterType="com.basketboy.talking.pojo.CommentBean">
+        insert into
+        y_joke_comment(
+        comment_id,
+        joke_id,
+        comment_user_id,
+        comment_details,
+        comment_date)
+        values(
+        #{commentId},
+        #{jokeId},
+        #{commentUserId},
+        #{commentDetails},
+        #{commentDate})
+    </insert>
+
+    <select id="getJokeCommentById" resultMap="JokeCommentMap">
+        select * from
+        y_joke_comment where joke_id = #{jokeId} order by id asc
+    </select>
+
+    <update id="changeJokeLikeCount" parameterType="java.util.Map">
+        update y_joke set
+        art_like_count=#{art_like_count} where joke_id = #{joke_id}
+    </update>
+
+    <delete id="deleteJokeById">
+        delete from y_joke where joke_id= #{jokeId};
+    </delete>
+
+    <delete id="deleteJokeByList" parameterType="java.util.List">
+        delete from y_joke where joke_id IN
+        <foreach collection="list" item="jokeId" open="(" separator="," close=")">
+            #{jokeId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteJokeCommentById">
+        delete from y_joke_comment where comment_id=
+        #{comment_id};
+    </delete>
+
+    <delete id="deleteCommentList" parameterType="java.util.List">
+        delete from y_joke_comment where comment_id IN
+        <foreach collection="list" item="commentId" open="(" separator="," close=")">
+            #{commentId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteCommentByJokeId">
+        delete from y_joke_comment where joke_id=
+        #{jokeId};
+    </delete>
+
+    <delete id="deleteCommentByJokeIdList" parameterType="java.util.List">
+        delete from y_joke where joke_id IN
+        <foreach collection="list" item="jokeId" open="(" separator="," close=")">
+            #{jokeId}
+        </foreach>
+    </delete>
+
+    <select id="getUserSelfJokes" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select * from y_joke where joke_user_id=#{userId} order by
+        id desc
+    </select>
+
+    <select id="selectJokeLikeByUserId" resultMap="JokeLikeMap">
+        select * from
+        y_joke_like
+        where joke_user_id = #{userId}
+    </select>
+
+    <select id="getJokeListFog" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select * from y_joke where title like concat('%',#{key},'%') order by
+        id desc
+    </select>
+
+    <select id="searchJokeList" parameterType="com.basketboy.talking.pojo.JokeBean" resultMap="BaseResultMap">
+        select * from y_joke
+        <where>
+            <if test="title!=null">
+                title like concat('%',#{title},'%')
+            </if>
+            <if test="category!=null and category!='-1'">
+                and category =#{category}
+            </if>
+            <if test="jokeUserId!=null">
+                and joke_user_id=#{jokeUserId}
+            </if>
+            <if test="jokeId!=null">
+                and joke_id=#{jokeId}
+            </if>
+            <if test="tags!=null and tags!='-1'">
+                and tags like concat('%',#{tags},'%')
+            </if>
+        </where>
+        order by id desc
+
+    </select>
+
+</mapper>

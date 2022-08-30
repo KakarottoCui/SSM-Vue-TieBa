@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> -->
+<mapper namespace="com.basketboy.talking.mapper.FlowMapper">
+    <resultMap id="flowBean" type="com.basketboy.talking.pojo.FlowBean">
+        <result column="classic_count" property="classicCount" jdbcType="INTEGER"/>
+        <result column="yellow_count" property="yellowCount" jdbcType="INTEGER"/>
+        <result column="mind_count" property="mindCount" jdbcType="INTEGER"/>
+        <result column="shite_count" property="shiteCount" jdbcType="INTEGER"/>
+        <result column="cold_count" property="coldCount" jdbcType="INTEGER"/>
+        <result column="post_time" property="postTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <insert id="addFlow" parameterType="com.basketboy.talking.pojo.FlowBean">
+        insert into y_wcdog_flow
+        (classic_count,
+        yellow_count,
+        mind_count,
+        shite_count,
+        cold_count,
+        post_time) values
+        (#{classicCount},
+        #{yellowCount},
+        #{mindCount},
+        #{shiteCount},
+        #{coldCount},
+        #{postTime})
+    </insert>
+
+    <select id="getFlowData" resultMap="flowBean">
+        select * from y_wcdog_flow
+    </select>
+
+    <update id="upDateFlow" parameterType="com.basketboy.talking.pojo.FlowBean">
+        update y_wcdog_flow
+        <set>
+            <if test="classicCount != 0">classic_count = #{classicCount,jdbcType=INTEGER},</if>
+            <if test="yellowCount != 0">yellow_count = #{yellowCount,jdbcType=INTEGER},</if>
+            <if test="mindCount != 0">mind_count = #{mindCount,jdbcType=INTEGER},</if>
+            <if test="shiteCount != 0">shite_count = #{shiteCount,jdbcType=INTEGER},</if>
+            <if test="coldCount != 0">cold_count = #{coldCount,jdbcType=INTEGER},</if>
+            <if test="postTime != null">post_time = #{postTime,jdbcType=TIMESTAMP},</if>
+        </set>
+    </update>
+
+</mapper>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> -->
+<mapper namespace="com.basketboy.talking.mapper.UserMapper">
+    <resultMap id="userBean" type="com.basketboy.talking.pojo.UserBean">
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="password" property="password" jdbcType="VARCHAR"/>
+        <result column="nickname" property="nickname" jdbcType="VARCHAR"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+        <result column="user_icon" property="userIcon" jdbcType="VARCHAR"/>
+        <result column="talk" property="talk" jdbcType="VARCHAR"/>
+        <result column="address" property="address" jdbcType="VARCHAR"/>
+        <result column="token" property="token" jdbcType="VARCHAR"/>
+        <result column="regist_time" property="registTime" jdbcType="TIMESTAMP"/>
+        <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP"/>
+        <result column="banned" property="banned" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!-- id名称必须和 UserMapper中的方法名相对应 -->
+    <insert id="addUser" parameterType="com.basketboy.talking.pojo.UserBean">
+        insert into y_user
+        (name,password,nickname,user_id,regist_time,banned) values
+        (#{name},#{password},#{nickname},#{userId},#{registTime},#{banned})
+    </insert>
+
+    <select id="getUserByName" parameterType="java.lang.String"
+            resultMap="userBean">
+        select * from y_user where name = #{name}
+    </select>
+    <select id="getUserById" parameterType="java.lang.String"
+            resultMap="userBean">
+        select * from y_user where user_id = #{userId}
+    </select>
+
+    <select id="getUserByNick" parameterType="java.lang.String"
+            resultMap="userBean">
+        select * from y_user where nickname = #{nick}
+    </select>
+
+    <select id="getUserList" resultMap="userBean">
+        select * from y_user order by id desc
+    </select>
+
+    <update id="updateUser" parameterType="com.basketboy.talking.pojo.UserBean">
+        update y_user
+        <set>
+            <if test="name != null">name = #{name,jdbcType=VARCHAR},</if>
+            <if test="password != null">password = #{password,jdbcType=VARCHAR},</if>
+            <if test="nickname != null">nickname = #{nickname,jdbcType=VARCHAR},</if>
+            <if test="userId != null">user_id = #{userId,jdbcType=VARCHAR},</if>
+            <if test="userIcon != null">user_icon = #{userIcon,jdbcType=VARCHAR},</if>
+            <if test="talk != null">talk = #{talk,jdbcType=VARCHAR},</if>
+            <if test="address != null">address = #{address,jdbcType=VARCHAR},</if>
+            <if test="token != null">token = #{token,jdbcType=VARCHAR},</if>
+            <if test="registTime != null">regist_time = #{registTime,jdbcType=TIMESTAMP},</if>
+            <if test="lastLoginTime != null">last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},</if>
+            <if test="banned != null">banned = #{banned,jdbcType=INTEGER},</if>
+        </set>
+        where user_id = #{userId}
+    </update>
+
+    <delete id="deleteUserById">
+        delete from y_user where user_id= #{userId};
+    </delete>
+
+    <delete id="deleteUserByList" parameterType="java.util.List">
+        delete from y_user where user_id IN
+        <foreach collection="list" item="userId" open="(" separator="," close=")">
+            #{userId}
+        </foreach>
+    </delete>
+
+</mapper>
